@@ -27,7 +27,8 @@ vectordb = FAISS.from_documents(Documents, GoogleGenerativeAIEmbeddings(model="m
 retriver = vectordb.as_retriever()
  
 
-from langchain_community.tools.retriever import create_retriever_tool
+from langchain.tools.retriever_tool import create_retriever_tool
+
 retrieval_tool = create_retriever_tool(
     retriever=retriver, name="Document_Search", description="useful to know Daphal Sanket Anil"
 )
@@ -100,6 +101,7 @@ if flag:
     
 
 #agent_executor.invoke({"input": "what is langchain?"})
+
 
 
 
