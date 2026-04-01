@@ -77,7 +77,12 @@ flag2 = False
 if input_text:
     response = agent.invoke({"messages": [{"role": "user", "content": input_text}]})
     final_message = response["messages"][-1]
-    st.write(final_message.content)
+    content = final_message.content
+    if isinstance(content, list):
+        text_parts = [block["text"] for block in content if isinstance(block, dict) and "text" in block]
+        st.write("".join(text_parts))
+    else:
+        st.write(content)
     flag = True
  
  
