@@ -1,4 +1,7 @@
  
+from dotenv import load_dotenv
+load_dotenv()
+
 #Wikipedia Query Tool
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
@@ -27,7 +30,7 @@ vectordb = FAISS.from_documents(Documents, GoogleGenerativeAIEmbeddings(model="m
 retriver = vectordb.as_retriever()
  
 
-from langchain.tools.retriever import create_retriever_tool
+from langchain_core.tools.retriever import create_retriever_tool
 
 retrieval_tool = create_retriever_tool(
     retriever=retriver, name="Document_Search", description="useful to know Daphal Sanket Anil"
@@ -44,10 +47,7 @@ arxiv = ArxivQueryRun(api_wrapper=arxiv_wrapper,description = "Use this tool ONL
 
 tools = [retrieval_tool, wiki, arxiv]
 
-from dotenv import load_dotenv
-load_dotenv() # This correctly loads the key from your .env file into the environment
 import os
-# The hardcoded line that was here is now gone
 from langchain_google_genai import ChatGoogleGenerativeAI  
 
 
@@ -56,21 +56,13 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
 
-#promt template
-from langchain import hub
+from langchain.agents import create_agent
 
-## get promt template from langchain hub
-prompt = hub.pull("hwchase17/openai-functions-agent")
- 
-
-##Agent
-from langchain.agents import create_tool_calling_agent
-agent = create_tool_calling_agent(llm, tools, prompt=prompt)
- 
- 
- # To run agent we need agent executer
-from langchain.agents import AgentExecutor
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+agent = create_agent(
+    model=llm,
+    tools=tools,
+    system_prompt="You are a helpful assistant.",
+)
 
 #streamlit framework
 import streamlit as st 
@@ -83,8 +75,9 @@ input_text = st.text_input("Enter your question here")
 flag = False
 flag2 = False
 if input_text:
-    response = agent_executor.invoke({"input": input_text})
-    st.write(response['output'])
+    response = agent.invoke({"messages": [{"role": "user", "content": input_text}]})
+    final_message = response["messages"][-1]
+    st.write(final_message.content)
     flag = True
  
  
@@ -100,7 +93,6 @@ if flag:
 
     
 
-#agent_executor.invoke({"input": "what is langchain?"})
 
 
 
