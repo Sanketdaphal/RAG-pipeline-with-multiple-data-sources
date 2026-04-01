@@ -1,14 +1,14 @@
-langchain_core
+langchain_core>=1.2.8
+langchain>=1.2.8
+langchain_community>=0.4.1
 langchain_text_splitters
+langgraph
 python-dotenv
 streamlit
-langchain_community
-langserve
 pypdf
 faiss-cpu
 wikipedia
 arxiv
-langchain
 langchain-google-genai
  
 
